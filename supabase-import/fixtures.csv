@@ -1,0 +1,105 @@
+id,fifa_match_id,round,group_code,home_team,away_team,kickoff_at,venue,status,home_score,away_score,winner_team,updated_at
+82a0a77d-67aa-5cb5-8989-8b843888a0ec,M1,group_1,A,Mexico,South Africa,2026-06-11T18:00:00Z,Mexico City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+7c1c32ef-c16a-56f4-9d69-d713e8692723,M2,group_1,A,Korea Republic,Czechia,2026-06-11T22:00:00Z,Estadio Guadalajara,scheduled,,,,2026-06-10T00:00:00Z
+6fc1a117-53b6-5c0e-a41d-81643a5e91d9,M3,group_1,B,Canada,Bosnia and Herzegovina,2026-06-12T17:00:00Z,Toronto Stadium,scheduled,,,,2026-06-10T00:00:00Z
+b5445b2b-936a-59bd-b767-2dcfbe562f04,M4,group_1,B,Qatar,Switzerland,2026-06-12T22:00:00Z,Los Angeles Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ab836c36-6717-5378-aae8-cd6b16046975,M5,group_1,C,Brazil,Morocco,2026-06-13T17:00:00Z,Boston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ee3fb4b3-d2d7-5bea-a5e8-509cc9c871ff,M6,group_1,C,Haiti,Scotland,2026-06-13T22:00:00Z,BC Place Vancouver,scheduled,,,,2026-06-10T00:00:00Z
+e395a6f2-4ca8-532f-ab01-005ef9611429,M7,group_1,D,USA,Paraguay,2026-06-13T17:00:00Z,New York New Jersey Stadium,scheduled,,,,2026-06-10T00:00:00Z
+d2ce206f-1ddb-50ea-ae06-2b2ac7d57d8f,M8,group_1,D,Australia,Turkiye,2026-06-13T22:00:00Z,San Francisco Bay Area Stadium,scheduled,,,,2026-06-10T00:00:00Z
+fb6ad863-26ff-5317-8e94-78e49cbd93cf,M9,group_1,E,Cote d'Ivoire,Ecuador,2026-06-14T17:00:00Z,Philadelphia Stadium,scheduled,,,,2026-06-10T00:00:00Z
+1336cbcb-95d3-5f6d-8ad2-ef6794e94497,M10,group_1,E,Germany,Curacao,2026-06-14T22:00:00Z,Houston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+c7e95ff0-c35f-592f-9b1a-806fc23d1879,M11,group_1,F,Netherlands,Japan,2026-06-14T17:00:00Z,Dallas Stadium,scheduled,,,,2026-06-10T00:00:00Z
+9e796b48-ee6c-5e33-8212-a6849808da1c,M12,group_1,F,Sweden,Tunisia,2026-06-14T22:00:00Z,Estadio Monterrey,scheduled,,,,2026-06-10T00:00:00Z
+7ceff0e3-dace-5bbe-ac70-d6a8337d20c2,M13,group_1,G,IR Iran,New Zealand,2026-06-15T17:00:00Z,Miami Stadium,scheduled,,,,2026-06-10T00:00:00Z
+2da4f730-7368-5fc9-815c-39d579ff57af,M14,group_1,G,Belgium,Egypt,2026-06-15T22:00:00Z,Atlanta Stadium,scheduled,,,,2026-06-10T00:00:00Z
+a4f326bd-8275-58f3-b938-6fbab77743bf,M15,group_1,H,Saudi Arabia,Uruguay,2026-06-15T17:00:00Z,Seattle Stadium,scheduled,,,,2026-06-10T00:00:00Z
+1ead762e-29f1-53a2-8f90-cccbd1e5f241,M16,group_1,H,Spain,Cabo Verde,2026-06-15T22:00:00Z,Kansas City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+c35945a3-34ef-596e-98b6-f8e11e8193c0,M17,group_1,I,France,Senegal,2026-06-16T17:00:00Z,Mexico City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+64577399-0968-5285-97e9-347ef90aaf5c,M18,group_1,I,Iraq,Norway,2026-06-16T22:00:00Z,Estadio Guadalajara,scheduled,,,,2026-06-10T00:00:00Z
+414de659-f766-52df-bbec-b097172b6ea6,M19,group_1,J,Argentina,Algeria,2026-06-16T17:00:00Z,Toronto Stadium,scheduled,,,,2026-06-10T00:00:00Z
+b34eea62-1495-5067-bfc9-e61591150a73,M20,group_1,J,Austria,Jordan,2026-06-16T22:00:00Z,Los Angeles Stadium,scheduled,,,,2026-06-10T00:00:00Z
+cf5430bd-be15-5f59-af0e-458525b82b01,M21,group_1,K,Portugal,Congo DR,2026-06-17T17:00:00Z,Boston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+d09d3756-0bfd-57cb-91d8-5db97c400fc6,M22,group_1,K,Uzbekistan,Colombia,2026-06-17T22:00:00Z,BC Place Vancouver,scheduled,,,,2026-06-10T00:00:00Z
+e4fa7afb-f4a3-5827-b8c8-abd0fe6ef8c5,M23,group_1,L,Ghana,Panama,2026-06-17T17:00:00Z,New York New Jersey Stadium,scheduled,,,,2026-06-10T00:00:00Z
+7e56d564-a32a-5616-bd58-85ea4c996b8d,M24,group_1,L,England,Croatia,2026-06-17T22:00:00Z,San Francisco Bay Area Stadium,scheduled,,,,2026-06-10T00:00:00Z
+2ab3d62a-a842-5e1f-885a-4fa8956b49bd,M25,group_2,A,Mexico,Korea Republic,2026-06-18T17:00:00Z,Philadelphia Stadium,scheduled,,,,2026-06-10T00:00:00Z
+f22c6e4f-fe0c-5bdf-a5ae-ce090c13ce79,M26,group_2,A,Czechia,South Africa,2026-06-18T22:00:00Z,Houston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+2f84adf7-7e71-5f17-9bf6-94fe809ac8a6,M27,group_2,B,Canada,Qatar,2026-06-18T17:00:00Z,Dallas Stadium,scheduled,,,,2026-06-10T00:00:00Z
+cbb1aaa1-6359-5395-869b-9026d7586bd5,M28,group_2,B,Switzerland,Bosnia and Herzegovina,2026-06-18T22:00:00Z,Estadio Monterrey,scheduled,,,,2026-06-10T00:00:00Z
+70e4b8c4-f3d5-520d-9064-f7cfb13342dd,M29,group_2,C,Brazil,Haiti,2026-06-19T17:00:00Z,Miami Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ec793efa-d8c8-5c0b-9826-b8b62ca8a25d,M30,group_2,C,Scotland,Morocco,2026-06-19T22:00:00Z,Atlanta Stadium,scheduled,,,,2026-06-10T00:00:00Z
+5d0e6041-55fc-5450-8a2b-6d01d48e37d1,M31,group_2,D,USA,Australia,2026-06-19T17:00:00Z,Seattle Stadium,scheduled,,,,2026-06-10T00:00:00Z
+917a1e29-7d0a-528a-afee-5a9b93831081,M32,group_2,D,Turkiye,Paraguay,2026-06-19T22:00:00Z,Kansas City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+2243debb-d1c0-55c5-8025-6e930f6943ef,M33,group_2,E,Cote d'Ivoire,Germany,2026-06-20T17:00:00Z,Mexico City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+6850163c-6986-59e1-a127-7f7d7b7d74c5,M34,group_2,E,Curacao,Ecuador,2026-06-20T22:00:00Z,Estadio Guadalajara,scheduled,,,,2026-06-10T00:00:00Z
+2a59344c-785f-54bd-a2d3-f502422aa5e9,M35,group_2,F,Netherlands,Sweden,2026-06-20T17:00:00Z,Toronto Stadium,scheduled,,,,2026-06-10T00:00:00Z
+20e5f8a4-b0be-5788-b7bc-27a142bbebf6,M36,group_2,F,Tunisia,Japan,2026-06-20T22:00:00Z,Los Angeles Stadium,scheduled,,,,2026-06-10T00:00:00Z
+9e91f9f1-2875-5f09-8bb2-7ac811631c29,M37,group_2,G,IR Iran,Belgium,2026-06-21T17:00:00Z,Boston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+408d0082-7767-5799-b444-de88343c88f7,M38,group_2,G,Egypt,New Zealand,2026-06-21T22:00:00Z,BC Place Vancouver,scheduled,,,,2026-06-10T00:00:00Z
+500a0b27-f805-5d84-b3f2-d152dcce70f0,M39,group_2,H,Saudi Arabia,Spain,2026-06-21T17:00:00Z,New York New Jersey Stadium,scheduled,,,,2026-06-10T00:00:00Z
+7e7bef11-bd67-5164-8afb-9529375aebb9,M40,group_2,H,Cabo Verde,Uruguay,2026-06-21T22:00:00Z,San Francisco Bay Area Stadium,scheduled,,,,2026-06-10T00:00:00Z
+6158bb3a-4060-5950-9371-8f558cfcaafe,M41,group_2,I,France,Iraq,2026-06-22T17:00:00Z,Philadelphia Stadium,scheduled,,,,2026-06-10T00:00:00Z
+bb09aad3-7123-59e7-a5e9-ccd70fb7053c,M42,group_2,I,Norway,Senegal,2026-06-22T22:00:00Z,Houston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+90ffd9d9-a1a5-55fc-a73f-1d665af75af7,M43,group_2,J,Argentina,Austria,2026-06-22T17:00:00Z,Dallas Stadium,scheduled,,,,2026-06-10T00:00:00Z
+d3a8701b-b530-5e45-983c-857c89ad57ed,M44,group_2,J,Jordan,Algeria,2026-06-22T22:00:00Z,Estadio Monterrey,scheduled,,,,2026-06-10T00:00:00Z
+64534e3e-6b03-530c-8aa6-be27ae3af53f,M45,group_2,K,Portugal,Uzbekistan,2026-06-23T17:00:00Z,Miami Stadium,scheduled,,,,2026-06-10T00:00:00Z
+f726a634-2ad2-5d60-9119-72d45689c660,M46,group_2,K,Colombia,Congo DR,2026-06-23T22:00:00Z,Atlanta Stadium,scheduled,,,,2026-06-10T00:00:00Z
+c19a47fc-c43b-5657-93ac-4811e55b3121,M47,group_2,L,Ghana,England,2026-06-23T17:00:00Z,Seattle Stadium,scheduled,,,,2026-06-10T00:00:00Z
+7aa572f8-9b17-5811-b049-0b6a4ea5875a,M48,group_2,L,Croatia,Panama,2026-06-23T22:00:00Z,Kansas City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+e20082c0-0410-51d7-be61-04377f2fde81,M49,group_3,A,Czechia,Mexico,2026-06-24T17:00:00Z,Mexico City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+6167591e-b53e-5c81-b203-89bf4b1e32b4,M50,group_3,A,South Africa,Korea Republic,2026-06-24T22:00:00Z,Estadio Guadalajara,scheduled,,,,2026-06-10T00:00:00Z
+8cff88f1-aa72-545b-80cd-a67222633227,M51,group_3,B,Switzerland,Canada,2026-06-24T17:00:00Z,Toronto Stadium,scheduled,,,,2026-06-10T00:00:00Z
+f11df24b-7982-55e9-a8f5-0073d6d3d33c,M52,group_3,B,Bosnia and Herzegovina,Qatar,2026-06-24T22:00:00Z,Los Angeles Stadium,scheduled,,,,2026-06-10T00:00:00Z
+c342710b-d4ed-59de-8872-b505666c4c0b,M53,group_3,C,Scotland,Brazil,2026-06-24T17:00:00Z,Boston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+9899a04e-cf80-5fc9-ab37-183530927286,M54,group_3,C,Morocco,Haiti,2026-06-24T22:00:00Z,BC Place Vancouver,scheduled,,,,2026-06-10T00:00:00Z
+4dff48bf-67fe-5337-838c-8cd9951db37b,M55,group_3,D,Turkiye,USA,2026-06-25T17:00:00Z,New York New Jersey Stadium,scheduled,,,,2026-06-10T00:00:00Z
+29f400fe-4997-5e0e-af20-69a219457512,M56,group_3,D,Paraguay,Australia,2026-06-25T22:00:00Z,San Francisco Bay Area Stadium,scheduled,,,,2026-06-10T00:00:00Z
+e8dec05b-8e83-5a1a-aacc-bb2aca04f85d,M57,group_3,E,Curacao,Cote d'Ivoire,2026-06-25T17:00:00Z,Philadelphia Stadium,scheduled,,,,2026-06-10T00:00:00Z
+02c97792-c0c5-56d1-83cf-546854301ac5,M58,group_3,E,Ecuador,Germany,2026-06-25T22:00:00Z,Houston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ad77a159-9677-57b8-8cd6-565b8d223a43,M59,group_3,F,Tunisia,Netherlands,2026-06-25T17:00:00Z,Dallas Stadium,scheduled,,,,2026-06-10T00:00:00Z
+f4eb1216-acd4-55b1-a05e-b1defa23724e,M60,group_3,F,Japan,Sweden,2026-06-25T22:00:00Z,Estadio Monterrey,scheduled,,,,2026-06-10T00:00:00Z
+d22871bb-e391-564e-94f8-1830d8cfafcd,M61,group_3,G,Egypt,IR Iran,2026-06-26T17:00:00Z,Miami Stadium,scheduled,,,,2026-06-10T00:00:00Z
+4f3ce66c-08b2-5246-89e0-08be6980fcf0,M62,group_3,G,New Zealand,Belgium,2026-06-26T22:00:00Z,Atlanta Stadium,scheduled,,,,2026-06-10T00:00:00Z
+fc8fa699-8fc3-5fd3-8ff6-fe7630868538,M63,group_3,H,Cabo Verde,Saudi Arabia,2026-06-26T17:00:00Z,Seattle Stadium,scheduled,,,,2026-06-10T00:00:00Z
+bc9b6d40-0391-5914-8ce5-fcf51a977f97,M64,group_3,H,Uruguay,Spain,2026-06-26T22:00:00Z,Kansas City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+82030b8f-6eaf-5f1e-9f37-8b3633ec37f7,M65,group_3,I,Norway,France,2026-06-26T17:00:00Z,Mexico City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ff8d3610-5864-5bd6-a2d1-e30930badabe,M66,group_3,I,Senegal,Iraq,2026-06-26T22:00:00Z,Estadio Guadalajara,scheduled,,,,2026-06-10T00:00:00Z
+4fde5018-ea88-51c9-b71b-9d9f5dcff0f1,M67,group_3,J,Jordan,Argentina,2026-06-27T17:00:00Z,Toronto Stadium,scheduled,,,,2026-06-10T00:00:00Z
+bf1cb44c-c9f3-5609-a92f-c7b127d1aa26,M68,group_3,J,Algeria,Austria,2026-06-27T22:00:00Z,Los Angeles Stadium,scheduled,,,,2026-06-10T00:00:00Z
+e3264666-f9f5-5382-af4e-14b9353ee4aa,M69,group_3,K,Colombia,Portugal,2026-06-27T17:00:00Z,Boston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+41850d04-84e2-5109-8910-5f8cc9552fdc,M70,group_3,K,Congo DR,Uzbekistan,2026-06-27T22:00:00Z,BC Place Vancouver,scheduled,,,,2026-06-10T00:00:00Z
+e957f145-770e-5885-a9ad-1814724cce8e,M71,group_3,L,Croatia,Ghana,2026-06-27T17:00:00Z,New York New Jersey Stadium,scheduled,,,,2026-06-10T00:00:00Z
+1d02fdd5-a548-5d00-bb65-4747a42ed0bd,M72,group_3,L,Panama,England,2026-06-27T22:00:00Z,San Francisco Bay Area Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ffaab9b3-98c1-5cb2-9b7c-2671c83e8f00,M73,round_32,,TBD,TBD,2026-06-28T19:00:00Z,Philadelphia Stadium,scheduled,,,,2026-06-10T00:00:00Z
+5112384b-69a5-5a3a-8ccc-4179a7c4fc62,M74,round_32,,TBD,TBD,2026-06-28T00:00:00Z,Houston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+aee5c376-900e-5839-839c-b38f5090d17f,M75,round_32,,TBD,TBD,2026-06-28T19:00:00Z,Dallas Stadium,scheduled,,,,2026-06-10T00:00:00Z
+53c5e830-e8c5-572c-94a1-d2a916ace2cd,M76,round_32,,TBD,TBD,2026-06-28T00:00:00Z,Estadio Monterrey,scheduled,,,,2026-06-10T00:00:00Z
+4340a585-0bdc-5b83-8bfe-d00287ab8437,M77,round_32,,TBD,TBD,2026-06-29T19:00:00Z,Miami Stadium,scheduled,,,,2026-06-10T00:00:00Z
+2f67bbf8-b240-5b2c-8b2a-89e70694d48c,M78,round_32,,TBD,TBD,2026-06-29T00:00:00Z,Atlanta Stadium,scheduled,,,,2026-06-10T00:00:00Z
+c6f1a97a-bf76-5e90-bc47-2824a51a5112,M79,round_32,,TBD,TBD,2026-06-29T19:00:00Z,Seattle Stadium,scheduled,,,,2026-06-10T00:00:00Z
+6aa894f9-169e-5509-ac8e-c650ef550ed8,M80,round_32,,TBD,TBD,2026-06-29T00:00:00Z,Kansas City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+7632e6b5-d11f-5cab-9691-6623949de167,M81,round_32,,TBD,TBD,2026-06-30T19:00:00Z,Mexico City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+5962a0f5-1451-5b32-9715-3dfb2288780b,M82,round_32,,TBD,TBD,2026-06-30T00:00:00Z,Estadio Guadalajara,scheduled,,,,2026-06-10T00:00:00Z
+109c3452-bdd4-52ec-a75c-e80152d076ca,M83,round_32,,TBD,TBD,2026-06-30T19:00:00Z,Toronto Stadium,scheduled,,,,2026-06-10T00:00:00Z
+c611c63a-e7ab-5408-8a74-b3013d03575a,M84,round_32,,TBD,TBD,2026-06-30T00:00:00Z,Los Angeles Stadium,scheduled,,,,2026-06-10T00:00:00Z
+c1753f78-a9fc-564d-b1d0-0e48c9427344,M85,round_32,,TBD,TBD,2026-07-01T19:00:00Z,Boston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ab35515f-6c49-5957-951e-5d6d5f5b138b,M86,round_32,,TBD,TBD,2026-07-01T00:00:00Z,BC Place Vancouver,scheduled,,,,2026-06-10T00:00:00Z
+af4e7009-f6cf-50e3-9ef0-9489d1a03a38,M87,round_32,,TBD,TBD,2026-07-01T19:00:00Z,New York New Jersey Stadium,scheduled,,,,2026-06-10T00:00:00Z
+980ae0ee-55b8-58f0-a4c8-c0abf4589e46,M88,round_32,,TBD,TBD,2026-07-01T00:00:00Z,San Francisco Bay Area Stadium,scheduled,,,,2026-06-10T00:00:00Z
+6171a9e5-f2ac-59f5-b843-dc74c01c881f,M89,round_16,,TBD,TBD,2026-07-04T19:00:00Z,Philadelphia Stadium,scheduled,,,,2026-06-10T00:00:00Z
+c7eb6125-dd31-5153-8d07-c4cb6cf08624,M90,round_16,,TBD,TBD,2026-07-04T00:00:00Z,Houston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+a767470e-753f-576c-af57-e481083914ed,M91,round_16,,TBD,TBD,2026-07-04T19:00:00Z,Dallas Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ae68c1c0-3135-5932-9c54-6b45e3386a13,M92,round_16,,TBD,TBD,2026-07-04T00:00:00Z,Estadio Monterrey,scheduled,,,,2026-06-10T00:00:00Z
+ea698254-7ac2-5f29-b5b5-e399cb9f9d1a,M93,round_16,,TBD,TBD,2026-07-05T19:00:00Z,Miami Stadium,scheduled,,,,2026-06-10T00:00:00Z
+90db6def-a0b2-5675-a539-3b97d6e3c6a5,M94,round_16,,TBD,TBD,2026-07-05T00:00:00Z,Atlanta Stadium,scheduled,,,,2026-06-10T00:00:00Z
+9447a4ff-eb27-519b-8d20-4ac32b4c3a27,M95,round_16,,TBD,TBD,2026-07-05T19:00:00Z,Seattle Stadium,scheduled,,,,2026-06-10T00:00:00Z
+7779460a-807c-5590-ab16-eb5d5b7603b4,M96,round_16,,TBD,TBD,2026-07-05T00:00:00Z,Kansas City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+a2933097-862d-5e0c-9afd-e38fa15da145,M97,quarter_final,,TBD,TBD,2026-07-09T19:00:00Z,Mexico City Stadium,scheduled,,,,2026-06-10T00:00:00Z
+ddc24b0d-c326-5b14-9e9c-4c16f544024f,M98,quarter_final,,TBD,TBD,2026-07-09T00:00:00Z,Estadio Guadalajara,scheduled,,,,2026-06-10T00:00:00Z
+f9baeb7a-e0e2-572a-9bbb-82851055dd81,M99,quarter_final,,TBD,TBD,2026-07-09T19:00:00Z,Toronto Stadium,scheduled,,,,2026-06-10T00:00:00Z
+23ca6b85-4f1f-5c1e-a8a5-cf1c0126875e,M100,quarter_final,,TBD,TBD,2026-07-09T00:00:00Z,Los Angeles Stadium,scheduled,,,,2026-06-10T00:00:00Z
+fdb94281-830f-57be-a428-6361d6f62c67,M101,semi_final,,TBD,TBD,2026-07-14T19:00:00Z,Boston Stadium,scheduled,,,,2026-06-10T00:00:00Z
+13bee06f-96cc-59d1-829f-1c26c4fe05dc,M102,semi_final,,TBD,TBD,2026-07-14T00:00:00Z,BC Place Vancouver,scheduled,,,,2026-06-10T00:00:00Z
+daa0a56c-0dfe-5e67-8ba3-e000a59493cb,M103,third_place,,Semi-final loser,Semi-final loser,2026-07-18T21:00:00Z,New York New Jersey Stadium,scheduled,,,,2026-06-10T00:00:00Z
+32825d7b-e53d-5558-937f-ae52529938c5,M104,final,,Finalist,Finalist,2026-07-19T19:00:00Z,San Francisco Bay Area Stadium,scheduled,,,,2026-06-10T00:00:00Z

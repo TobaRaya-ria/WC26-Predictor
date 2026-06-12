@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>World Cup Predictor 2026</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="hero-art" aria-hidden="true">
+        <span class="pitch-line center"></span>
+        <span class="pitch-line box left"></span>
+        <span class="pitch-line box right"></span>
+      </div>
+      <nav class="topbar">
+        <div class="brand">
+          <span class="brand-mark">26</span>
+          <span>World Cup Predictor</span>
+        </div>
+        <div class="user-actions">
+          <span id="saveStatus" class="save-status">Local save ready</span>
+          <button id="authButton" class="ghost-button">Log in / Sign up</button>
+        </div>
+      </nav>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">FIFA World Cup 2026</p>
+          <h1>Build the whole tournament, then chase every matchday.</h1>
+          <p class="hero-copy">
+            Rank all 12 groups, choose the best third-place teams, pick every knockout winner, and lock score predictions before kickoff.
+          </p>
+        </div>
+        <div class="score-panel">
+          <span>Current bracket score</span>
+          <strong id="projectedScore">0 pts</strong>
+          <small id="lockNote">Points stay 0 until official results are loaded.</small>
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="tabs" aria-label="Predictor views">
+        <button class="tab-button active" data-tab="bracket">Whole Cup</button>
+        <button class="tab-button" data-tab="matches">Nearest Matches</button>
+        <button class="tab-button" data-tab="standing">Standing</button>
+      </section>
+
+      <section id="bracket" class="tab-panel active">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Step 1</p>
+            <h2>Group Stage Ranking</h2>
+          </div>
+          <button id="resetGroups" class="ghost-button small">Reset groups</button>
+        </div>
+        <div id="groupsGrid" class="groups-grid"></div>
+
+        <div class="section-head spaced">
+          <div>
+            <p class="eyebrow">Step 2</p>
+            <h2>Best Third-Place Finishers</h2>
+          </div>
+          <span id="thirdCounter" class="pill">0 / 8 selected</span>
+        </div>
+        <div id="thirdPlaceGrid" class="third-grid"></div>
+
+        <div class="section-head spaced">
+          <div>
+            <p class="eyebrow">Step 3</p>
+            <h2>Knockout Bracket</h2>
+          </div>
+          <button id="clearKnockout" class="ghost-button small">Clear picks</button>
+        </div>
+        <div id="knockoutGrid" class="knockout-grid"></div>
+
+        <div class="section-head spaced">
+          <div>
+            <p class="eyebrow">Step 4</p>
+            <h2>Final Placement</h2>
+          </div>
+        </div>
+        <div id="placementGrid" class="placement-grid"></div>
+        <div class="submit-strip">
+          <div>
+            <strong>Whole bracket prediction</strong>
+            <p id="bracketSubmitStatus" class="muted">Draft autosaves while you edit.</p>
+          </div>
+          <button id="finalizeBracket" class="primary-button" type="button">Submit bracket</button>
+        </div>
+      </section>
+
+      <section id="matches" class="tab-panel">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Live match center</p>
+            <h2>Three Nearest Matches</h2>
+          </div>
+          <button id="refreshMatches" class="ghost-button small">Refresh</button>
+        </div>
+        <div id="matchSummary" class="match-summary"></div>
+        <div id="matchesList" class="matches-list"></div>
+      </section>
+
+      <section id="standing" class="tab-panel">
+        <div class="standing-layout">
+          <div>
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Your profile</p>
+                <h2>Saved Predictions</h2>
+              </div>
+            </div>
+            <div id="profilePanel" class="profile-panel"></div>
+          </div>
+          <div>
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">Global</p>
+                <h2>Leaderboard</h2>
+              </div>
+            </div>
+            <div id="leaderboard" class="leaderboard"></div>
+            <button id="exportCsv" class="ghost-button small export-button">Download spreadsheet</button>
+          </div>
+        </div>
+        <div class="rules-panel">
+          <h3>Point System</h3>
+          <div id="rulesGrid" class="rules-grid"></div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="authDialog" class="auth-dialog">
+      <form id="authForm" method="dialog">
+        <div class="section-head compact">
+          <div>
+            <p id="authEyebrow" class="eyebrow">Welcome back</p>
+            <h2 id="authTitle">Log in</h2>
+          </div>
+          <button type="button" id="closeAuth" class="icon-button" aria-label="Close">x</button>
+        </div>
+        <div class="auth-mode" role="group" aria-label="Authentication mode">
+          <button type="button" id="loginMode" class="tab-button active">Log in</button>
+          <button type="button" id="signupMode" class="tab-button">Sign up</button>
+        </div>
+        <label>
+          Username
+          <input id="usernameInput" required minlength="3" maxlength="24" autocomplete="username" placeholder="letters, numbers, underscores" />
+        </label>
+        <label>
+          Password
+          <input id="passwordInput" type="password" required minlength="6" autocomplete="current-password" placeholder="6+ characters" />
+        </label>
+        <div class="dialog-actions">
+          <button id="authSubmit" type="submit" class="primary-button">Log in</button>
+          <button type="button" id="googleMock" class="ghost-button">Use Google</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="vendor/supabase-js.js"></script>
+    <script>
+      if (!window.supabase && typeof supabase !== "undefined") window.supabase = supabase;
+    </script>
+    <script src="app.js"></script>
+  </body>
+</html>
