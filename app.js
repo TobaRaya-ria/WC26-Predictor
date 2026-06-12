@@ -892,16 +892,16 @@
 
   function renderRules() {
     const rules = [
-      "Grouped: 1 point per correct nation",
-      "17-32: 1.5 points",
-      "9-16: 2 points",
-      "5-8: 3.5 points",
-      "3-4 range: 5 points, exact 3rd or 4th: 6.5",
-      "Grand final participant: 8 points",
-      "Runner-up: 10 points",
-      "Winner: 15 points",
-      "50% in grouped / 17-32 / 9-16: +2, 75%: +5",
-      "All 3rd, 4th, finalists, runner-up, winner right: +7.5",
+      "Grouped: 2 points per correct nation",
+      "17-32: 3 points",
+      "9-16: 4 points",
+      "5-8: 7 points",
+      "3-4 range: 10 points, exact 3rd or 4th: 13",
+      "Grand final participant: 16 points",
+      "Runner-up: 20 points",
+      "Winner: 30 points",
+      "50% in grouped / 17-32 / 9-16: +4, 75%: +10",
+      "All 3rd, 4th, finalists, runner-up, winner right: +15",
       "Match exact score doubles the round points",
       "Match points rise from 1 in group MD1 to 12 in the final",
     ];
