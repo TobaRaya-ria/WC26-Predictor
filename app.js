@@ -86,6 +86,7 @@
   let tournamentLockAt = new Date(DEFAULT_TOURNAMENT_LOCK_AT);
   let liveFixtures = [];
   let fixtureIdByMatchId = {};
+  let actualTournamentResults = {};
   let remoteLeaderboard = [];
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -214,6 +215,7 @@
       supabaseReady = true;
       await hydrateSupabaseSession();
       await loadFixturesFromSupabase();
+      await loadActualTournamentResultsFromSupabase();
       await loadLeaderboardFromSupabase();
       flashSave("Supabase connected");
     } catch (error) {
@@ -501,6 +503,23 @@
       .order("rank", { ascending: true })
       .limit(25);
     remoteLeaderboard = data || [];
+  }
+
+  async function loadActualTournamentResultsFromSupabase() {
+    if (!supabaseReady) return;
+    const { data, error } = await supabaseClient
+      .from("actual_tournament_results")
+      .select("team_code, placement");
+    if (error) {
+      console.warn("Could not load actual tournament results", error);
+      actualTournamentResults = {};
+      return;
+    }
+    actualTournamentResults = Object.fromEntries(
+      (data || [])
+        .map((row) => [String(row.team_code || "").toUpperCase(), normalizePlacementKey(row.placement)])
+        .filter(([teamCode, placement]) => teamCode && placement)
+    );
   }
 
   function switchTab(tab) {
@@ -1064,7 +1083,65 @@
   }
 
   function calculateBracketScore() {
-    return hasAnyResults() ? 0 : 0;
+    const actualEntries = Object.entries(actualTournamentResults);
+    if (!actualEntries.length) return 0;
+
+    const predictedPlacements = placementByTeamCode(calculatePlacements());
+    const exactCounts = { grouped: 0, r32: 0, r16: 0, winner: 0, runner: 0, third: 0, fourth: 0 };
+    const actualCounts = { grouped: 0, r32: 0, r16: 0, winner: 0, runner: 0, third: 0, fourth: 0 };
+
+    let total = 0;
+    actualEntries.forEach(([teamCode, actualPlacement]) => {
+      if (actualPlacement in actualCounts) actualCounts[actualPlacement] += 1;
+      const predictedPlacement = predictedPlacements[teamCode];
+      if (!predictedPlacement) return;
+      if (predictedPlacement === actualPlacement && actualPlacement in exactCounts) exactCounts[actualPlacement] += 1;
+      total += bracketPlacementPoints(actualPlacement, predictedPlacement);
+    });
+
+    ["grouped", "r32", "r16"].forEach((placement) => {
+      const actualCount = actualCounts[placement];
+      if (!actualCount) return;
+      const ratio = exactCounts[placement] / actualCount;
+      if (ratio >= 0.75) total += 10;
+      else if (ratio >= 0.5) total += 4;
+    });
+
+    if (
+      actualCounts.winner === 1 &&
+      actualCounts.runner === 1 &&
+      actualCounts.third === 1 &&
+      actualCounts.fourth === 1 &&
+      exactCounts.winner === 1 &&
+      exactCounts.runner === 1 &&
+      exactCounts.third === 1 &&
+      exactCounts.fourth === 1
+    ) {
+      total += 15;
+    }
+
+    return total;
+  }
+
+  function bracketPlacementPoints(actualPlacement, predictedPlacement) {
+    if (actualPlacement === "winner") return predictedPlacement === "winner" ? 30 : predictedPlacement === "runner" ? 16 : 0;
+    if (actualPlacement === "runner") return predictedPlacement === "runner" ? 20 : predictedPlacement === "winner" ? 16 : 0;
+    if (actualPlacement === "third" || actualPlacement === "fourth") {
+      if (predictedPlacement === actualPlacement) return 13;
+      return predictedPlacement === "third" || predictedPlacement === "fourth" ? 10 : 0;
+    }
+    const points = { qf: 7, r16: 4, r32: 3, grouped: 2 };
+    return predictedPlacement === actualPlacement ? points[actualPlacement] || 0 : 0;
+  }
+
+  function placementByTeamCode(placements) {
+    const result = {};
+    Object.entries(placements || {}).forEach(([placement, teams]) => {
+      (teams || []).forEach((team) => {
+        if (team?.code) result[String(team.code).toUpperCase()] = placement;
+      });
+    });
+    return result;
   }
 
   function calculateMatchScore() {
@@ -1222,7 +1299,7 @@
   }
 
   function hasAnyResults() {
-    return getLiveFixtures().some((match) => Boolean(match.result));
+    return Boolean(Object.keys(actualTournamentResults).length) || getLiveFixtures().some((match) => Boolean(match.result));
   }
 
   function serializeSubmission() {
@@ -1671,5 +1748,34 @@
   function titleCase(value) {
     if (!value) return "";
     return String(value).charAt(0).toUpperCase() + String(value).slice(1).toLowerCase();
+  }
+
+  function normalizePlacementKey(value) {
+    const key = String(value || "").trim().toLowerCase().replace(/[-\s]+/g, "_");
+    const aliases = {
+      champion: "winner",
+      winner: "winner",
+      runner_up: "runner",
+      runner: "runner",
+      second: "runner",
+      third: "third",
+      third_place: "third",
+      fourth: "fourth",
+      fourth_place: "fourth",
+      quarter_finalist: "qf",
+      quarterfinalist: "qf",
+      qf: "qf",
+      fifth_to_eighth: "qf",
+      round_of_16: "r16",
+      r16: "r16",
+      ninth_to_sixteenth: "r16",
+      round_of_32: "r32",
+      r32: "r32",
+      seventeenth_to_thirty_second: "r32",
+      grouped: "grouped",
+      group_stage: "grouped",
+      eliminated_group: "grouped",
+    };
+    return aliases[key] || "";
   }
 })();

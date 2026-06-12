@@ -70,6 +70,18 @@ create table if not exists tournament_predictions (
   unique(user_id)
 );
 
+create table if not exists actual_tournament_results (
+  team_code text primary key,
+  team_name text not null,
+  placement text,
+  updated_at timestamptz default now(),
+  check (
+    placement is null
+    or placement = ''
+    or placement in ('winner', 'runner', 'third', 'fourth', 'qf', 'r16', 'r32', 'grouped')
+  )
+);
+
 create table if not exists match_predictions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
@@ -151,18 +163,123 @@ match_scores as (
   join fixtures f on f.id = mp.fixture_id
   group by mp.user_id
 ),
+prediction_placements as (
+  select
+    tp.user_id,
+    placement.key as predicted_placement,
+    team.value->>'code' as team_code
+  from tournament_predictions tp
+  cross join lateral jsonb_each(coalesce(tp.final_placements, '{}'::jsonb)) as placement(key, value)
+  cross join lateral jsonb_array_elements(
+    case
+      when jsonb_typeof(placement.value) = 'array' then placement.value
+      else '[]'::jsonb
+    end
+  ) as team(value)
+  where team.value ? 'code'
+),
+actual_placements as (
+  select team_code, placement
+  from actual_tournament_results
+  where placement is not null
+    and placement <> ''
+),
+bracket_base_scores as (
+  select
+    pp.user_id,
+    sum(
+      case
+        when ap.placement = 'winner' and pp.predicted_placement = 'winner' then 30
+        when ap.placement = 'winner' and pp.predicted_placement in ('winner', 'runner') then 16
+        when ap.placement = 'runner' and pp.predicted_placement = 'runner' then 20
+        when ap.placement = 'runner' and pp.predicted_placement in ('winner', 'runner') then 16
+        when ap.placement in ('third', 'fourth') and pp.predicted_placement = ap.placement then 13
+        when ap.placement in ('third', 'fourth') and pp.predicted_placement in ('third', 'fourth') then 10
+        when ap.placement = 'qf' and pp.predicted_placement = 'qf' then 7
+        when ap.placement = 'r16' and pp.predicted_placement = 'r16' then 4
+        when ap.placement = 'r32' and pp.predicted_placement = 'r32' then 3
+        when ap.placement = 'grouped' and pp.predicted_placement = 'grouped' then 2
+        else 0
+      end
+    )::numeric as base_score
+  from prediction_placements pp
+  join actual_placements ap on ap.team_code = pp.team_code
+  group by pp.user_id
+),
+bracket_category_bonus as (
+  select
+    per_category.user_id,
+    sum(
+      case
+        when per_category.actual_count > 0
+         and per_category.correct_count::numeric / per_category.actual_count >= 0.75 then 10
+        when per_category.actual_count > 0
+         and per_category.correct_count::numeric / per_category.actual_count >= 0.5 then 4
+        else 0
+      end
+    )::numeric as category_bonus
+  from (
+    select
+      tp.user_id,
+      ap.placement,
+      count(ap.team_code) as actual_count,
+      count(pp.team_code) filter (where pp.predicted_placement = ap.placement) as correct_count
+    from tournament_predictions tp
+    cross join actual_placements ap
+    left join prediction_placements pp
+      on pp.user_id = tp.user_id
+     and pp.team_code = ap.team_code
+    where ap.placement in ('grouped', 'r32', 'r16')
+    group by tp.user_id, ap.placement
+  ) per_category
+  group by per_category.user_id
+),
+bracket_top_bonus as (
+  select
+    tp.user_id,
+    case
+      when count(*) filter (
+        where ap.placement in ('winner', 'runner', 'third', 'fourth')
+          and pp.predicted_placement = ap.placement
+      ) = 4
+      and count(*) filter (where ap.placement in ('winner', 'runner', 'third', 'fourth')) = 4
+      then 15::numeric
+      else 0::numeric
+    end as top_bonus
+  from tournament_predictions tp
+  cross join actual_placements ap
+  left join prediction_placements pp
+    on pp.user_id = tp.user_id
+   and pp.team_code = ap.team_code
+  group by tp.user_id
+),
+bracket_scores as (
+  select
+    tp.user_id,
+    (
+      coalesce(bbs.base_score, 0)
+      + coalesce(bcb.category_bonus, 0)
+      + coalesce(btb.top_bonus, 0)
+    )::numeric as bracket_score
+  from tournament_predictions tp
+  left join bracket_base_scores bbs on bbs.user_id = tp.user_id
+  left join bracket_category_bonus bcb on bcb.user_id = tp.user_id
+  left join bracket_top_bonus btb on btb.user_id = tp.user_id
+),
 scored as (
   select
     p.id as user_id,
     p.username,
-    0::numeric as bracket_score,
+    coalesce(bs.bracket_score, 0)::numeric as bracket_score,
     coalesce(ms.match_score, 0)::numeric as match_score,
-    coalesce(ms.match_score, 0)::numeric as total_score
+    (coalesce(bs.bracket_score, 0) + coalesce(ms.match_score, 0))::numeric as total_score
   from profiles p
   join predictors pr on pr.user_id = p.id
   left join match_scores ms on ms.user_id = p.id
+  left join bracket_scores bs on bs.user_id = p.id
   cross join result_state rs
   where rs.finished_matches > 0
+     or exists (select 1 from actual_placements)
 )
 select
   user_id,
@@ -174,7 +291,7 @@ select
 from scored;
 
 grant usage on schema public to anon, authenticated;
-grant select on profiles, fixtures, scores to anon, authenticated;
+grant select on profiles, fixtures, actual_tournament_results, scores to anon, authenticated;
 grant select on leaderboard to anon, authenticated;
 grant insert, update on profiles to authenticated;
 grant select, insert, update on tournament_predictions to authenticated;
@@ -183,6 +300,7 @@ grant select, insert, update on match_predictions to authenticated;
 alter table profiles enable row level security;
 alter table fixtures enable row level security;
 alter table tournament_predictions enable row level security;
+alter table actual_tournament_results enable row level security;
 alter table match_predictions enable row level security;
 alter table scores enable row level security;
 
@@ -205,6 +323,11 @@ with check (auth.uid() = id);
 drop policy if exists "Fixtures are readable" on fixtures;
 create policy "Fixtures are readable"
 on fixtures for select
+using (true);
+
+drop policy if exists "Actual tournament results are readable" on actual_tournament_results;
+create policy "Actual tournament results are readable"
+on actual_tournament_results for select
 using (true);
 
 drop policy if exists "Users can read their tournament prediction" on tournament_predictions;
