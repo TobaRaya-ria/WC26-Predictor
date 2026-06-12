@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - World Cup Predictor 2026</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-header">
+      <nav class="topbar">
+        <div class="brand">
+          <span class="brand-mark">26</span>
+          <span>Predictor Admin</span>
+        </div>
+        <div class="user-actions">
+          <span id="adminStatus" class="save-status">Admin locked</span>
+          <button id="refreshAdmin" class="ghost-button small" type="button" disabled>Refresh</button>
+          <button id="signOutAdmin" class="ghost-button small" type="button" hidden>Sign out</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="admin-main">
+      <section id="adminLogin" class="admin-login">
+        <div>
+          <p class="eyebrow">Private view</p>
+          <h1>Admin Predictions</h1>
+          <p class="admin-copy">Log in with the allowed admin account to view every bracket and match prediction.</p>
+        </div>
+        <form id="adminAuthForm" class="admin-auth-form" novalidate>
+          <label>
+            Username
+            <input id="adminUsername" autocomplete="username" placeholder="admin username" />
+          </label>
+          <label>
+            Password
+            <input id="adminPassword" type="password" autocomplete="current-password" placeholder="password" />
+          </label>
+          <button class="primary-button" type="submit">Log in</button>
+        </form>
+      </section>
+
+      <section id="adminDashboard" class="admin-dashboard" hidden>
+        <div class="admin-summary">
+          <div>
+            <p class="eyebrow">Accounts</p>
+            <strong id="accountCount">0</strong>
+          </div>
+          <div>
+            <p class="eyebrow">Fixtures</p>
+            <strong id="fixtureCount">0</strong>
+          </div>
+          <div>
+            <p class="eyebrow">Last loaded</p>
+            <strong id="loadedAt">-</strong>
+          </div>
+        </div>
+
+        <section class="admin-section">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Whole bracket</p>
+              <h2>Every Account</h2>
+            </div>
+          </div>
+          <div id="accountPredictions" class="admin-account-grid"></div>
+        </section>
+
+        <section class="admin-section">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Match center</p>
+              <h2>Predictions By Fixture</h2>
+            </div>
+          </div>
+          <div id="matchPredictions" class="admin-match-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="vendor/supabase-js.js"></script>
+    <script>
+      if (!window.supabase && typeof supabase !== "undefined") window.supabase = supabase;
+    </script>
+    <script src="admin.js"></script>
+  </body>
+</html>
