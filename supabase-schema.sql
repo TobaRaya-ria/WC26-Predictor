@@ -106,6 +106,13 @@ select
 from profiles p
 join scores s on s.user_id = p.id;
 
+grant usage on schema public to anon, authenticated;
+grant select on profiles, fixtures, scores to anon, authenticated;
+grant select on leaderboard to anon, authenticated;
+grant insert, update on profiles to authenticated;
+grant select, insert, update on tournament_predictions to authenticated;
+grant select, insert, update on match_predictions to authenticated;
+
 alter table profiles enable row level security;
 alter table fixtures enable row level security;
 alter table tournament_predictions enable row level security;
@@ -143,7 +150,7 @@ create policy "Users can insert their tournament prediction"
 on tournament_predictions for insert
 with check (
   auth.uid() = user_id
-  and now() < timestamptz '2026-06-11 18:00:00+00'
+  and now() < timestamptz '2026-12-31 23:59:59+00'
 );
 
 drop policy if exists "Users can update their tournament prediction" on tournament_predictions;
@@ -151,11 +158,11 @@ create policy "Users can update their tournament prediction"
 on tournament_predictions for update
 using (
   auth.uid() = user_id
-  and now() < timestamptz '2026-06-11 18:00:00+00'
+  and now() < timestamptz '2026-12-31 23:59:59+00'
 )
 with check (
   auth.uid() = user_id
-  and now() < timestamptz '2026-06-11 18:00:00+00'
+  and now() < timestamptz '2026-12-31 23:59:59+00'
 );
 
 drop policy if exists "Users can read their match predictions" on match_predictions;

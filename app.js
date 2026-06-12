@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const TOURNAMENT_START = new Date("2026-06-11T12:00:00-06:00");
+  const DEFAULT_TOURNAMENT_LOCK_AT = "2026-12-31T23:59:59Z";
   const SAVE_KEY = "wc26-predictor-v2";
   const API_ENABLED = location.protocol === "http:" || location.protocol === "https:";
   const API_BASE = API_ENABLED ? location.origin : "";
@@ -83,6 +83,7 @@
   let supabaseReady = false;
   let supabaseInitPromise = null;
   let supabaseInitError = "";
+  let tournamentLockAt = new Date(DEFAULT_TOURNAMENT_LOCK_AT);
   let liveFixtures = [];
   let fixtureIdByMatchId = {};
   let remoteLeaderboard = [];
@@ -207,6 +208,7 @@
       if (!config.supabaseUrl || !config.supabaseAnonKey) {
         throw new Error("Supabase env vars are missing from /api/config.");
       }
+      tournamentLockAt = parseLockDate(config.tournamentLockAt);
 
       supabaseClient = supabaseApi.createClient(config.supabaseUrl, config.supabaseAnonKey);
       supabaseReady = true;
@@ -717,18 +719,29 @@
           };
           persist();
           renderStanding();
-          submit.disabled = !canPredict || !state.user || !isMatchPredictionComplete({ home: home.value, away: away.value, outcome: select.value });
+          const nextPrediction = { home: home.value, away: away.value, outcome: select.value };
+          submit.disabled = !canPredict || !state.user || !isMatchPredictionComplete(nextPrediction);
+          help.textContent = matchSubmitHelp(match, nextPrediction, canPredict, finalized);
         });
       });
       const submit = el("button", "primary-button small match-submit");
+      const help = textEl("small", "match-help", matchSubmitHelp(match, prediction, canPredict, finalized));
       submit.type = "button";
       submit.textContent = finalized ? "Submitted" : "Submit";
       submit.disabled = finalized || !canPredict || !state.user || !isMatchPredictionComplete({ home: home.value, away: away.value, outcome: select.value });
       submit.addEventListener("click", () => finalizeMatchPrediction(match.id, home.value, away.value, select.value));
-      box.append(home, away, select, submit);
+      box.append(home, away, select, submit, help);
       card.appendChild(box);
       dom.matchesList.appendChild(card);
     });
+  }
+
+  function matchSubmitHelp(match, prediction, canPredict, finalized) {
+    if (finalized) return "Saved";
+    if (!canPredict) return match.kickoff <= Date.now() ? "Kickoff passed" : "Locked until this round opens";
+    if (!state.user) return "Log in to submit";
+    if (!isMatchPredictionComplete(prediction)) return "Enter score first";
+    return "Ready";
   }
 
   async function finalizeBracketPrediction() {
@@ -1278,7 +1291,13 @@
   }
 
   function isTournamentStarted() {
-    return Date.now() >= TOURNAMENT_START.getTime();
+    return Date.now() >= tournamentLockAt.getTime();
+  }
+
+  function parseLockDate(value) {
+    const date = new Date(value || DEFAULT_TOURNAMENT_LOCK_AT);
+    if (Number.isNaN(date.getTime())) return new Date(DEFAULT_TOURNAMENT_LOCK_AT);
+    return date;
   }
 
   function isBracketComplete() {

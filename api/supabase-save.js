@@ -1,4 +1,4 @@
-const TOURNAMENT_START = new Date("2026-06-11T18:00:00Z").getTime();
+const DEFAULT_TOURNAMENT_LOCK_AT = "2026-12-31T23:59:59Z";
 
 module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
@@ -61,7 +61,7 @@ async function upsertSupabaseProfile(supabaseUrl, serviceRoleKey, userId, userna
 }
 
 async function upsertTournamentPrediction(supabaseUrl, serviceRoleKey, userId, submission) {
-  if (Date.now() >= TOURNAMENT_START) return false;
+  if (Date.now() >= tournamentLockAt()) return false;
 
   const payload = {
     user_id: userId,
@@ -149,6 +149,12 @@ function getBearerToken(request) {
   const header = request.headers.authorization || request.headers.Authorization || "";
   const match = String(header).match(/^Bearer\s+(.+)$/i);
   return match ? match[1].trim() : "";
+}
+
+function tournamentLockAt() {
+  const date = new Date(process.env.NEXT_PUBLIC_TOURNAMENT_LOCK_AT || DEFAULT_TOURNAMENT_LOCK_AT);
+  if (Number.isNaN(date.getTime())) return new Date(DEFAULT_TOURNAMENT_LOCK_AT).getTime();
+  return date.getTime();
 }
 
 function supabaseJsonHeaders(serviceRoleKey, prefer) {
