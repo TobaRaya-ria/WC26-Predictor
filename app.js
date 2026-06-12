@@ -709,8 +709,16 @@
         option.selected = prediction.outcome === outcome;
         select.appendChild(option);
       });
+      [home, away].forEach((control) => {
+        control.addEventListener("input", () => {
+          const inferredOutcome = inferOutcomeFromScore(home.value, away.value, outcomes);
+          if (inferredOutcome) select.value = inferredOutcome;
+        });
+      });
       [home, away, select].forEach((control) => {
         control.addEventListener("change", () => {
+          const inferredOutcome = control === select ? "" : inferOutcomeFromScore(home.value, away.value, outcomes);
+          if (inferredOutcome) select.value = inferredOutcome;
           state.matchPredictions[match.id] = {
             home: home.value,
             away: away.value,
@@ -734,6 +742,16 @@
       card.appendChild(box);
       dom.matchesList.appendChild(card);
     });
+  }
+
+  function inferOutcomeFromScore(homeScore, awayScore, outcomes) {
+    if (homeScore === "" || awayScore === "") return "";
+    const homeValue = Number(homeScore);
+    const awayValue = Number(awayScore);
+    if (!Number.isFinite(homeValue) || !Number.isFinite(awayValue)) return "";
+    if (homeValue > awayValue) return "Home";
+    if (awayValue > homeValue) return "Away";
+    return outcomes.includes("Draw") ? "Draw" : "";
   }
 
   function matchSubmitHelp(match, prediction, canPredict, finalized) {
