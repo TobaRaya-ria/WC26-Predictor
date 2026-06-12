@@ -80,7 +80,7 @@ async function upsertMatchPredictions(supabaseUrl, serviceRoleKey, userId, match
   const fixtureMap = await loadSupabaseFixtureMap(supabaseUrl, serviceRoleKey);
   const entries = [];
   Object.entries(matchPredictions).forEach(([matchId, prediction]) => {
-    if (prediction.home === "" || prediction.away === "") return;
+    if (!prediction.outcome) return;
     const fixture = fixtureMap[matchId];
     if (!fixture) {
       if (prediction.finalizedAt) throw new Error(`Fixture ${matchId} is not synced to Supabase.`);
@@ -90,8 +90,8 @@ async function upsertMatchPredictions(supabaseUrl, serviceRoleKey, userId, match
     entries.push({
       user_id: userId,
       fixture_id: fixture.id,
-      predicted_home_score: Number(prediction.home),
-      predicted_away_score: Number(prediction.away),
+      predicted_home_score: optionalScore(prediction.home),
+      predicted_away_score: optionalScore(prediction.away),
       predicted_outcome: String(prediction.outcome || "").toLowerCase(),
       locked_at: prediction.finalizedAt || null,
       updated_at: new Date().toISOString(),
@@ -108,6 +108,10 @@ async function upsertMatchPredictions(supabaseUrl, serviceRoleKey, userId, match
     );
   }
   return entries.length;
+}
+
+function optionalScore(value) {
+  return value === "" || value === null || value === undefined ? null : Number(value);
 }
 
 async function loadSupabaseFixtureMap(supabaseUrl, serviceRoleKey) {

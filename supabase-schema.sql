@@ -74,14 +74,17 @@ create table if not exists match_predictions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   fixture_id uuid not null references fixtures(id) on delete cascade,
-  predicted_home_score int not null,
-  predicted_away_score int not null,
+  predicted_home_score int,
+  predicted_away_score int,
   predicted_outcome text not null,
   locked_at timestamptz,
   submitted_at timestamptz default now(),
   updated_at timestamptz default now(),
   unique(user_id, fixture_id)
 );
+
+alter table match_predictions alter column predicted_home_score drop not null;
+alter table match_predictions alter column predicted_away_score drop not null;
 
 create table if not exists scores (
   id uuid primary key default gen_random_uuid(),

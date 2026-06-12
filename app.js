@@ -472,8 +472,8 @@
         const matchId = fixtureMap[prediction.fixture_id];
         if (!matchId) return;
         state.matchPredictions[matchId] = {
-          home: String(prediction.predicted_home_score),
-          away: String(prediction.predicted_away_score),
+          home: prediction.predicted_home_score === null ? "" : String(prediction.predicted_home_score),
+          away: prediction.predicted_away_score === null ? "" : String(prediction.predicted_away_score),
           outcome: titleCase(prediction.predicted_outcome),
           finalizedAt: prediction.locked_at || "",
         };
@@ -554,7 +554,8 @@
       card.innerHTML = `<div class="group-title"><span>Group ${group}</span><small>Drag 1-4</small></div>`;
       const list = el("ol", "team-list");
       teams.forEach((item, index) => {
-        const li = el("li", "team-item");
+        const qualifierClass = index < 2 ? " qualified" : index === 2 ? " third-place" : "";
+        const li = el("li", `team-item${qualifierClass}`);
         li.draggable = !isBracketLocked();
         li.dataset.group = group;
         li.dataset.index = index;
@@ -736,10 +737,11 @@
         });
       });
       const submit = el("button", "primary-button small match-submit");
-      const help = textEl("small", "match-help", matchSubmitHelp(match, prediction, canPredict, finalized));
+      const initialPrediction = { home: home.value, away: away.value, outcome: select.value };
+      const help = textEl("small", "match-help", matchSubmitHelp(match, initialPrediction, canPredict, finalized));
       submit.type = "button";
       submit.textContent = finalized ? "Submitted" : "Submit";
-      submit.disabled = finalized || !canPredict || !state.user || !isMatchPredictionComplete({ home: home.value, away: away.value, outcome: select.value });
+      submit.disabled = finalized || !canPredict || !state.user || !isMatchPredictionComplete(initialPrediction);
       submit.addEventListener("click", () => finalizeMatchPrediction(match.id, home.value, away.value, select.value));
       box.append(home, away, select, submit, help);
       card.appendChild(box);
@@ -765,14 +767,15 @@
         : prediction.outcome === "Away"
         ? `${match.away} win`
         : "Draw";
-    return `Your prediction: ${prediction.home}-${prediction.away}, ${outcome}`;
+    const scoreText = prediction.home !== "" && prediction.away !== "" ? `${prediction.home}-${prediction.away}, ` : "";
+    return `Your prediction: ${scoreText}${outcome}`;
   }
 
   function matchSubmitHelp(match, prediction, canPredict, finalized) {
     if (finalized) return "Saved";
     if (!canPredict) return match.kickoff <= Date.now() ? "Kickoff passed" : "Locked until this round opens";
     if (!state.user) return "Log in to submit";
-    if (!isMatchPredictionComplete(prediction)) return "Enter score first";
+    if (!isMatchPredictionComplete(prediction)) return "Choose result";
     return "Ready";
   }
 
@@ -817,7 +820,7 @@
       return;
     }
     if (!isMatchPredictionComplete({ home, away, outcome })) {
-      flashSave("Enter score and result first");
+      flashSave("Choose a result first");
       return;
     }
     const previousPrediction = state.matchPredictions[matchId] || {};
@@ -1071,7 +1074,11 @@
       const base = matchPoints[match.round] || 0;
       const actualOutcome = match.result.home === match.result.away ? "Draw" : match.result.home > match.result.away ? "Home" : "Away";
       if (prediction.outcome !== actualOutcome) return total;
-      const exact = Number(prediction.home) === match.result.home && Number(prediction.away) === match.result.away;
+      const exact =
+        prediction.home !== "" &&
+        prediction.away !== "" &&
+        Number(prediction.home) === match.result.home &&
+        Number(prediction.away) === match.result.away;
       return total + (exact ? base * 2 : base);
     }, 0);
   }
@@ -1079,7 +1086,11 @@
   function scorePredictionLabel(match, prediction) {
     if (!prediction.outcome) return "No prediction";
     const actualOutcome = match.result.home === match.result.away ? "Draw" : match.result.home > match.result.away ? "Home" : "Away";
-    const exact = Number(prediction.home) === match.result.home && Number(prediction.away) === match.result.away;
+    const exact =
+      prediction.home !== "" &&
+      prediction.away !== "" &&
+      Number(prediction.home) === match.result.home &&
+      Number(prediction.away) === match.result.away;
     if (prediction.outcome !== actualOutcome) return "Wrong";
     return exact ? "Exact score" : "Correct result";
   }
@@ -1157,7 +1168,7 @@
   async function saveMatchPredictions() {
     const entries = [];
     Object.entries(state.matchPredictions).forEach(([matchId, prediction]) => {
-      if (prediction.home === "" || prediction.away === "") return;
+      if (!prediction.outcome) return;
       const fixtureId = fixtureIdByMatchId[matchId];
       if (!fixtureId) {
         if (prediction.finalizedAt) {
@@ -1168,8 +1179,8 @@
       entries.push({
         user_id: state.user.id,
         fixture_id: fixtureId,
-        predicted_home_score: Number(prediction.home),
-        predicted_away_score: Number(prediction.away),
+        predicted_home_score: optionalScore(prediction.home),
+        predicted_away_score: optionalScore(prediction.away),
         predicted_outcome: String(prediction.outcome || "").toLowerCase(),
         locked_at: prediction.finalizedAt || null,
         updated_at: new Date().toISOString(),
@@ -1342,7 +1353,11 @@
   }
 
   function isMatchPredictionComplete(prediction) {
-    return prediction.home !== "" && prediction.away !== "" && Boolean(prediction.outcome);
+    return Boolean(prediction.outcome);
+  }
+
+  function optionalScore(value) {
+    return value === "" || value === null || value === undefined ? null : Number(value);
   }
 
   function defaultThirdQualifiers() {
