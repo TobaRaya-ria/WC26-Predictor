@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DEFAULT_TOURNAMENT_LOCK_AT = "2026-12-31T23:59:59Z";
+  const DEFAULT_TOURNAMENT_LOCK_AT = "2026-06-28T23:59:59Z";
   const SAVE_KEY = "wc26-predictor-v2";
   const API_ENABLED = location.protocol === "http:" || location.protocol === "https:";
   const API_BASE = API_ENABLED ? location.origin : "";

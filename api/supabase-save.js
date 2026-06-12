@@ -1,4 +1,4 @@
-const DEFAULT_TOURNAMENT_LOCK_AT = "2026-12-31T23:59:59Z";
+const DEFAULT_TOURNAMENT_LOCK_AT = "2026-06-28T23:59:59Z";
 
 module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
