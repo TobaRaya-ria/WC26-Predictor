@@ -117,6 +117,7 @@
       "saveStatus",
       "authButton",
       "authDialog",
+      "authStatus",
       "authForm",
       "authTitle",
       "authEyebrow",
@@ -257,6 +258,10 @@
     }
     if (!payload.password) {
       flashSave("Password required");
+      return;
+    }
+    if (payload.password.length < 6) {
+      flashSave("Password must be at least 6 characters");
       return;
     }
     payload.username = username;
@@ -1401,11 +1406,47 @@
   }
 
   function flashSave(message) {
-    dom.saveStatus.textContent = message;
+    const tone = notificationTone(message);
+    const target = dom.authDialog?.open ? dom.authStatus : dom.saveStatus;
+    const resetText = target === dom.authStatus ? "" : "Local save ready";
+    setStatusMessage(target, message, tone);
     window.clearTimeout(flashSave.timer);
     flashSave.timer = window.setTimeout(() => {
-      dom.saveStatus.textContent = "Local save ready";
+      setStatusMessage(target, resetText, "neutral");
     }, 1400);
+  }
+
+  function setStatusMessage(target, message, tone) {
+    if (!target) return;
+    target.textContent = message;
+    target.classList.remove("success", "error", "visible");
+    if (message) target.classList.add("visible");
+    if (tone === "success" || tone === "error") target.classList.add(tone);
+  }
+
+  function notificationTone(message) {
+    const text = String(message || "").toLowerCase();
+    const errorWords = [
+      "already",
+      "before",
+      "closed",
+      "could not",
+      "error",
+      "failed",
+      "finish",
+      "invalid",
+      "locked",
+      "missing",
+      "not ",
+      "offline",
+      "password required",
+      "required",
+      "taken",
+      "try again",
+      "use ",
+    ];
+    if (errorWords.some((word) => text.includes(word))) return "error";
+    return "success";
   }
 
   function isBracketLocked() {

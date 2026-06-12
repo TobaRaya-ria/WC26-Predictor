@@ -132,7 +132,7 @@
     </main>
 
     <dialog id="authDialog" class="auth-dialog">
-      <form id="authForm" method="dialog">
+      <form id="authForm" method="dialog" novalidate>
         <div class="section-head compact">
           <div>
             <p id="authEyebrow" class="eyebrow">Welcome back</p>
@@ -144,6 +144,7 @@
           <button type="button" id="loginMode" class="tab-button active">Log in</button>
           <button type="button" id="signupMode" class="tab-button">Sign up</button>
         </div>
+        <p id="authStatus" class="auth-status" role="status" aria-live="polite"></p>
         <label>
           Username
           <input id="usernameInput" required minlength="3" maxlength="24" autocomplete="username" placeholder="letters, numbers, underscores" />
