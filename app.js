@@ -861,11 +861,6 @@
     }
 
     dom.leaderboard.innerHTML = "";
-    if (!state.user || !hasPredictions || !hasResults) {
-      dom.leaderboard.innerHTML = `<div class="empty-state">No standings yet. Users appear here after they log in, make predictions, and official results are available.</div>`;
-      return;
-    }
-
     const rows = remoteLeaderboard.length
       ? remoteLeaderboard.map((row) => ({
           username: row.username,
@@ -873,7 +868,14 @@
           rank: row.rank,
           current: row.user_id === state.user?.id,
         }))
-      : [{ username: state.user.username, points: total, current: true }];
+      : state.user && hasPredictions && hasResults
+      ? [{ username: state.user.username, points: total, current: true }]
+      : [];
+    if (!rows.length) {
+      dom.leaderboard.innerHTML = `<div class="empty-state">No standings yet. Users appear here after they log in, make predictions, and official results are available.</div>`;
+      return;
+    }
+
     rows.forEach((row, index) => {
       const item = el("div", `leaderboard-row${row.current ? " current" : ""}`);
       item.innerHTML = `

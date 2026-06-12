@@ -95,16 +95,80 @@ create table if not exists scores (
   unique(user_id)
 );
 
-create or replace view leaderboard as
+create or replace view leaderboard
+with (security_invoker = false)
+as
+with result_state as (
+  select count(*) as finished_matches
+  from fixtures
+  where home_score is not null
+    and away_score is not null
+),
+predictors as (
+  select user_id from match_predictions
+  union
+  select user_id from tournament_predictions
+),
+match_scores as (
+  select
+    mp.user_id,
+    sum(
+      case
+        when f.home_score is null or f.away_score is null then 0
+        when mp.predicted_outcome =
+          case
+            when f.home_score = f.away_score then 'draw'
+            when f.home_score > f.away_score then 'home'
+            else 'away'
+          end
+        then
+          case f.round
+            when 'group_1' then 1
+            when 'group_2' then 1.2
+            when 'group_3' then 1.3
+            when 'round_32' then 1.5
+            when 'round_16' then 2.5
+            when 'quarter_final' then 5
+            when 'semi_final' then 7
+            when 'third_place' then 8
+            when 'final' then 12
+            else 0
+          end
+          *
+          case
+            when mp.predicted_home_score = f.home_score
+             and mp.predicted_away_score = f.away_score
+            then 2
+            else 1
+          end
+        else 0
+      end
+    )::numeric as match_score
+  from match_predictions mp
+  join fixtures f on f.id = mp.fixture_id
+  group by mp.user_id
+),
+scored as (
+  select
+    p.id as user_id,
+    p.username,
+    0::numeric as bracket_score,
+    coalesce(ms.match_score, 0)::numeric as match_score,
+    coalesce(ms.match_score, 0)::numeric as total_score
+  from profiles p
+  join predictors pr on pr.user_id = p.id
+  left join match_scores ms on ms.user_id = p.id
+  cross join result_state rs
+  where rs.finished_matches > 0
+)
 select
-  p.id as user_id,
-  p.username,
-  s.total_score,
-  s.bracket_score,
-  s.match_score,
-  rank() over (order by s.total_score desc) as rank
-from profiles p
-join scores s on s.user_id = p.id;
+  user_id,
+  username,
+  total_score,
+  bracket_score,
+  match_score,
+  rank() over (order by total_score desc, username asc) as rank
+from scored;
 
 grant usage on schema public to anon, authenticated;
 grant select on profiles, fixtures, scores to anon, authenticated;
