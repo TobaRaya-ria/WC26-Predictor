@@ -661,7 +661,7 @@
   function renderMatches() {
     const now = Date.now();
     const fixtures = getLiveFixtures().sort((a, b) => a.kickoff - b.kickoff);
-    const done = fixtures.filter((match) => match.kickoff < now && match.result);
+    const done = fixtures.filter((match) => match.kickoff < now);
     const upcoming = fixtures.filter((match) => match.kickoff >= now);
     const nearestIds = new Set(upcoming.slice(0, 3).map((match) => match.id));
     const currentRound = detectCurrentRound(fixtures, now);
@@ -688,12 +688,15 @@
       const prediction = state.matchPredictions[match.id] || {};
       const finalized = Boolean(prediction.finalizedAt);
       const canEdit = canPredict && !finalized;
-      const resultText = match.result ? `Result ${match.result.home}-${match.result.away}` : "Result pending";
+      const isPast = match.kickoff < now;
+      const resultText = match.result ? `Result ${match.result.home}-${match.result.away}` : isPast ? "Awaiting official result" : "Result pending";
       const status = finalized ? "Submitted" : match.result ? scorePredictionLabel(match, prediction) : canPredict ? "Open" : "Locked";
+      const predictionText = matchPredictionText(match, prediction);
       card.innerHTML = `
         <div>
           <div class="match-teams">${escapeHtml(match.home)} vs ${escapeHtml(match.away)}</div>
           <div class="match-meta">${formatDate(match.kickoff)} · ${escapeHtml(match.venue)} · ${escapeHtml(match.label)} · ${resultText} · ${status}</div>
+          <div class="match-prediction">${escapeHtml(predictionText)}</div>
         </div>
       `;
       const box = el("div", "prediction-box");
@@ -752,6 +755,17 @@
     if (homeValue > awayValue) return "Home";
     if (awayValue > homeValue) return "Away";
     return outcomes.includes("Draw") ? "Draw" : "";
+  }
+
+  function matchPredictionText(match, prediction) {
+    if (!isMatchPredictionComplete(prediction)) return "Your prediction: none";
+    const outcome =
+      prediction.outcome === "Home"
+        ? `${match.home} win`
+        : prediction.outcome === "Away"
+        ? `${match.away} win`
+        : "Draw";
+    return `Your prediction: ${prediction.home}-${prediction.away}, ${outcome}`;
   }
 
   function matchSubmitHelp(match, prediction, canPredict, finalized) {
