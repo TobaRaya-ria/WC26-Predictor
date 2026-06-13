@@ -26,7 +26,7 @@ async function loadAdminPredictions(request) {
   const adminProfile = await loadProfile(supabaseUrl, serviceRoleKey, authUser.id);
   assertAdmin(adminProfile);
 
-  const [profiles, tournamentPredictions, matchPredictions, fixtures, leaderboard] = await Promise.all([
+  const [profiles, tournamentPredictions, matchPredictions, fixtures, actualResults, leaderboard] = await Promise.all([
     supabaseGet(supabaseUrl, serviceRoleKey, "/rest/v1/profiles?select=id,username,display_name,created_at&order=username.asc"),
     supabaseGet(
       supabaseUrl,
@@ -42,6 +42,11 @@ async function loadAdminPredictions(request) {
       supabaseUrl,
       serviceRoleKey,
       "/rest/v1/fixtures?select=id,fifa_match_id,round,group_code,home_team,away_team,kickoff_at,venue,status,home_score,away_score,winner_team&order=kickoff_at.asc"
+    ),
+    supabaseGet(
+      supabaseUrl,
+      serviceRoleKey,
+      "/rest/v1/actual_tournament_results?select=team_code,team_name,placement,updated_at&order=team_code.asc"
     ),
     supabaseGet(supabaseUrl, serviceRoleKey, "/rest/v1/leaderboard?select=user_id,total_score,bracket_score,match_score,rank"),
   ]);
@@ -67,6 +72,7 @@ async function loadAdminPredictions(request) {
       leaderboard: leaderboardByUser[profile.id] || null,
     })),
     fixtures,
+    actualResults,
   };
 }
 

@@ -3,10 +3,29 @@
 
   const INTERNAL_AUTH_DOMAIN = "worldcup-predictor.invalid";
   const API_BASE = location.origin;
+  const PLACEMENT_OPTIONS = [
+    ["", "Not set"],
+    ["winner", "Winner"],
+    ["runner", "Runner-up"],
+    ["third", "Third"],
+    ["fourth", "Fourth"],
+    ["qf", "5-8"],
+    ["r16", "9-16"],
+    ["r32", "17-32"],
+    ["grouped", "Grouped"],
+  ];
+  const STATUS_OPTIONS = [
+    ["scheduled", "Scheduled"],
+    ["in_progress", "In progress"],
+    ["finished", "Finished"],
+    ["postponed", "Postponed"],
+    ["cancelled", "Cancelled"],
+  ];
   const dom = {};
   let supabaseClient = null;
   let fixtures = [];
   let accounts = [];
+  let actualResults = [];
 
   document.addEventListener("DOMContentLoaded", init);
 
@@ -29,6 +48,7 @@
       "accountCount",
       "fixtureCount",
       "loadedAt",
+      "bracketResults",
       "accountPredictions",
       "matchPredictions",
     ].forEach((id) => {
@@ -94,6 +114,7 @@
     await supabaseClient.auth.signOut();
     accounts = [];
     fixtures = [];
+    actualResults = [];
     dom.adminDashboard.hidden = true;
     dom.adminLogin.hidden = false;
     dom.signOutAdmin.hidden = true;
@@ -116,6 +137,7 @@
 
       fixtures = payload.fixtures || [];
       accounts = payload.accounts || [];
+      actualResults = payload.actualResults || [];
       renderDashboard(payload);
       setStatus(`Loaded ${accounts.length} accounts`, "success");
     } catch (error) {
@@ -135,8 +157,47 @@
     dom.accountCount.textContent = accounts.length;
     dom.fixtureCount.textContent = fixtures.length;
     dom.loadedAt.textContent = formatDate(payload.generatedAt);
+    renderBracketResults();
     renderAccounts();
     renderMatches();
+  }
+
+  function renderBracketResults() {
+    dom.bracketResults.innerHTML = "";
+    if (!actualResults.length) {
+      dom.bracketResults.innerHTML = `<div class="empty-state">Import actual_tournament_results.csv first.</div>`;
+      return;
+    }
+
+    actualResults.forEach((result) => {
+      const row = el("article", "admin-result-row");
+      const info = el("div", "admin-result-team");
+      info.appendChild(textEl("strong", "", result.team_name || result.team_code));
+      info.appendChild(textEl("span", "muted", result.team_code || ""));
+
+      const select = selectEl(PLACEMENT_OPTIONS, result.placement || "");
+      const save = textEl("button", "ghost-button small", "Save");
+      save.type = "button";
+      const note = textEl("span", "admin-inline-status", "");
+
+      save.addEventListener("click", async () => {
+        await runAdminSave(save, note, "Saving", "Saved", {
+          type: "bracket-result",
+          teamCode: result.team_code,
+          teamName: result.team_name,
+          placement: select.value,
+        });
+      });
+
+      const controls = el("div", "admin-result-editor");
+      controls.appendChild(fieldEl("Placement", select));
+      controls.appendChild(save);
+      controls.appendChild(note);
+
+      row.appendChild(info);
+      row.appendChild(controls);
+      dom.bracketResults.appendChild(row);
+    });
   }
 
   function renderAccounts() {
@@ -249,6 +310,7 @@
           <strong>${escapeHtml(actualScoreText(fixture))}</strong>
         </div>
       `;
+      card.appendChild(renderFixtureEditor(fixture));
 
       const table = el("table", "admin-prediction-table");
       table.innerHTML = `
@@ -277,6 +339,97 @@
     });
   }
 
+  function renderFixtureEditor(fixture) {
+    const editor = el("div", "admin-fixture-editor");
+    const homeScore = inputEl("number", fixture.home_score ?? "");
+    const awayScore = inputEl("number", fixture.away_score ?? "");
+    homeScore.min = "0";
+    homeScore.max = "99";
+    homeScore.inputMode = "numeric";
+    awayScore.min = "0";
+    awayScore.max = "99";
+    awayScore.inputMode = "numeric";
+
+    const winner = selectEl(
+      [
+        ["", "Winner not set"],
+        [fixture.home_team, `${fixture.home_team} win`],
+        [fixture.away_team, `${fixture.away_team} win`],
+        ["draw", "Draw"],
+      ],
+      normalizedWinnerValue(fixture)
+    );
+    const status = selectEl(STATUS_OPTIONS, fixture.status || "scheduled");
+    const save = textEl("button", "primary-button small", "Save result");
+    save.type = "button";
+    const note = textEl("span", "admin-inline-status", "");
+
+    [homeScore, awayScore].forEach((input) => {
+      input.addEventListener("input", () => {
+        const home = homeScore.value === "" ? null : Number(homeScore.value);
+        const away = awayScore.value === "" ? null : Number(awayScore.value);
+        if (home === null || away === null || !Number.isFinite(home) || !Number.isFinite(away)) return;
+        winner.value = home > away ? fixture.home_team : away > home ? fixture.away_team : "draw";
+        if (status.value === "scheduled") status.value = "finished";
+      });
+    });
+
+    save.addEventListener("click", async () => {
+      await runAdminSave(save, note, "Saving result", "Result saved", {
+        type: "fixture",
+        fixtureId: fixture.id,
+        homeScore: homeScore.value,
+        awayScore: awayScore.value,
+        winnerTeam: winner.value,
+        status: status.value,
+      });
+    });
+
+    editor.appendChild(fieldEl("Home score", homeScore));
+    editor.appendChild(fieldEl("Away score", awayScore));
+    editor.appendChild(fieldEl("Winner", winner));
+    editor.appendChild(fieldEl("Status", status));
+    editor.appendChild(save);
+    editor.appendChild(note);
+    return editor;
+  }
+
+  async function runAdminSave(button, note, pendingText, successText, payload) {
+    try {
+      button.disabled = true;
+      note.textContent = pendingText;
+      note.classList.remove("success", "error");
+      await saveAdminUpdate(payload);
+      note.textContent = successText;
+      note.classList.add("success");
+      await loadAdminData();
+    } catch (error) {
+      note.textContent = error.message || "Save failed";
+      note.classList.add("error");
+      setStatus(error.message || "Save failed", "error");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function saveAdminUpdate(payload) {
+    const { data } = await supabaseClient.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) throw new Error("Log in as admin first.");
+
+    const response = await fetch(`${API_BASE}/api/admin-update`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.error || "Admin update failed.");
+    return body;
+  }
+
   function sectionBlock(title, content) {
     const block = el("section", "admin-card-section");
     block.appendChild(textEl("h4", "", title));
@@ -289,6 +442,14 @@
       return "Result pending";
     }
     return `Actual ${fixture.home_score}-${fixture.away_score}`;
+  }
+
+  function normalizedWinnerValue(fixture) {
+    const winner = String(fixture.winner_team || "").trim();
+    if (!winner) return "";
+    if (winner.toLowerCase() === "draw") return "draw";
+    if (winner === fixture.home_team || winner === fixture.away_team) return winner;
+    return "";
   }
 
   function matchPredictionText(fixture, prediction) {
@@ -338,6 +499,32 @@
   function el(tag, className) {
     const node = document.createElement(tag);
     if (className) node.className = className;
+    return node;
+  }
+
+  function inputEl(type, value) {
+    const node = el("input", "");
+    node.type = type;
+    node.value = value;
+    return node;
+  }
+
+  function selectEl(options, value) {
+    const node = el("select", "");
+    options.forEach(([optionValue, label]) => {
+      const option = el("option", "");
+      option.value = optionValue;
+      option.textContent = label;
+      node.appendChild(option);
+    });
+    node.value = value;
+    return node;
+  }
+
+  function fieldEl(label, control) {
+    const node = el("label", "admin-field");
+    node.appendChild(textEl("span", "", label));
+    node.appendChild(control);
     return node;
   }
 
