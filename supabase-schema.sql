@@ -290,12 +290,13 @@ select
   rank() over (order by total_score desc, username asc) as rank
 from scored;
 
-grant usage on schema public to anon, authenticated;
+grant usage on schema public to anon, authenticated, service_role;
 grant select on profiles, fixtures, actual_tournament_results, scores to anon, authenticated;
-grant select on leaderboard to anon, authenticated;
+grant select on leaderboard to anon, authenticated, service_role;
 grant insert, update on profiles to authenticated;
 grant select, insert, update on tournament_predictions to authenticated;
 grant select, insert, update on match_predictions to authenticated;
+grant all privileges on profiles, fixtures, tournament_predictions, actual_tournament_results, match_predictions, scores to service_role;
 
 alter table profiles enable row level security;
 alter table fixtures enable row level security;
