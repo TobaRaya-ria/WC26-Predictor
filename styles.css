@@ -750,10 +750,21 @@ main {
 
 .leaderboard-row {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto;
+  grid-template-columns: 42px minmax(0, 1fr) repeat(4, minmax(74px, auto));
   gap: 12px;
   align-items: center;
   padding: 12px;
+}
+
+.leaderboard-row strong:not(:first-child) {
+  text-align: right;
+}
+
+.leaderboard-head {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .leaderboard-row.current {
@@ -888,5 +899,16 @@ main {
   .submit-strip {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .leaderboard-row {
+    grid-template-columns: 34px minmax(86px, 1fr) repeat(4, minmax(48px, auto));
+    gap: 7px;
+    padding: 10px 8px;
+    font-size: 0.82rem;
+  }
+
+  .leaderboard-head {
+    font-size: 0.64rem;
   }
 }

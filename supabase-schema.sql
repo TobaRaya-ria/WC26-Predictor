@@ -253,24 +253,87 @@ bracket_top_bonus as (
    and pp.team_code = ap.team_code
   group by tp.user_id
 ),
+bracket_placement_accuracy as (
+  select
+    pp.user_id,
+    sum(
+      case
+        when pp.predicted_placement = ap.placement then 1
+        when abs(
+          case
+            when pp.predicted_placement = 'grouped' then 0
+            when pp.predicted_placement = 'r32' then 1
+            when pp.predicted_placement = 'r16' then 2
+            when pp.predicted_placement = 'qf' then 3
+            when pp.predicted_placement in ('third', 'fourth') then 4
+            when pp.predicted_placement in ('winner', 'runner') then 5
+            else 99
+          end
+          -
+          case
+            when ap.placement = 'grouped' then 0
+            when ap.placement = 'r32' then 1
+            when ap.placement = 'r16' then 2
+            when ap.placement = 'qf' then 3
+            when ap.placement in ('third', 'fourth') then 4
+            when ap.placement in ('winner', 'runner') then 5
+            else -99
+          end
+        ) <= 1 then 0.5
+        when abs(
+          case
+            when pp.predicted_placement = 'grouped' then 0
+            when pp.predicted_placement = 'r32' then 1
+            when pp.predicted_placement = 'r16' then 2
+            when pp.predicted_placement = 'qf' then 3
+            when pp.predicted_placement in ('third', 'fourth') then 4
+            when pp.predicted_placement in ('winner', 'runner') then 5
+            else 99
+          end
+          -
+          case
+            when ap.placement = 'grouped' then 0
+            when ap.placement = 'r32' then 1
+            when ap.placement = 'r16' then 2
+            when ap.placement = 'qf' then 3
+            when ap.placement in ('third', 'fourth') then 4
+            when ap.placement in ('winner', 'runner') then 5
+            else -99
+          end
+        ) = 2 then 0.2
+        else 0
+      end
+    )::numeric as placement_score
+  from prediction_placements pp
+  join actual_placements ap on ap.team_code = pp.team_code
+  group by pp.user_id
+),
 bracket_scores as (
   select
     tp.user_id,
+    coalesce(bbs.base_score, 0)
+      + coalesce(bcb.category_bonus, 0)
+      + coalesce(btb.top_bonus, 0) as country_score,
+    coalesce(bpa.placement_score, 0) as placement_score,
     (
       coalesce(bbs.base_score, 0)
       + coalesce(bcb.category_bonus, 0)
       + coalesce(btb.top_bonus, 0)
+      + coalesce(bpa.placement_score, 0)
     )::numeric as bracket_score
   from tournament_predictions tp
   left join bracket_base_scores bbs on bbs.user_id = tp.user_id
   left join bracket_category_bonus bcb on bcb.user_id = tp.user_id
   left join bracket_top_bonus btb on btb.user_id = tp.user_id
+  left join bracket_placement_accuracy bpa on bpa.user_id = tp.user_id
 ),
 scored as (
   select
     p.id as user_id,
     p.username,
     coalesce(bs.bracket_score, 0)::numeric as bracket_score,
+    coalesce(bs.country_score, 0)::numeric as country_score,
+    coalesce(bs.placement_score, 0)::numeric as placement_score,
     coalesce(ms.match_score, 0)::numeric as match_score,
     (coalesce(bs.bracket_score, 0) + coalesce(ms.match_score, 0))::numeric as total_score
   from profiles p
@@ -286,6 +349,8 @@ select
   username,
   total_score,
   bracket_score,
+  country_score,
+  placement_score,
   match_score,
   rank() over (order by total_score desc, username asc) as rank
 from scored;

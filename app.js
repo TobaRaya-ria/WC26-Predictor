@@ -504,7 +504,7 @@
     if (!supabaseReady) return;
     const { data } = await supabaseClient
       .from("leaderboard")
-      .select("user_id, username, total_score, bracket_score, match_score, rank")
+      .select("user_id, username, total_score, bracket_score, country_score, placement_score, match_score, rank")
       .order("rank", { ascending: true })
       .limit(25);
     remoteLeaderboard = data || [];
@@ -869,7 +869,9 @@
 
   function renderStanding() {
     const matchScore = calculateMatchScore();
-    const bracketScore = calculateBracketScore();
+    const countryScore = calculateBracketCountryScore();
+    const placementScore = calculateBracketPlacementAccuracyScore();
+    const bracketScore = countryScore + placementScore;
     const total = bracketScore + matchScore;
     const hasPredictions = hasAnyPrediction();
     const hasResults = hasAnyResults();
@@ -880,8 +882,9 @@
       dom.profilePanel.innerHTML = `
         <p><strong>${escapeHtml(state.user.username)}</strong></p>
         ${state.user.email ? `<p class="muted">${escapeHtml(state.user.email)}</p>` : ""}
-        <p>Bracket: <strong>${bracketScore.toFixed(1)} pts</strong></p>
-        <p>Matches: <strong>${matchScore.toFixed(1)} pts</strong></p>
+        <p>Whole bracket accuracy: <strong>${countryScore.toFixed(1)} pts</strong></p>
+        <p>Country placement accuracy: <strong>${placementScore.toFixed(1)} pts</strong></p>
+        <p>Individual match accuracy: <strong>${matchScore.toFixed(1)} pts</strong></p>
         <p>Total: <strong>${total.toFixed(1)} pts</strong></p>
         <p class="muted">${hasResults ? "Results loaded, points are active." : "Points stay empty until official results are loaded."}</p>
       `;
@@ -892,22 +895,39 @@
       ? remoteLeaderboard.map((row) => ({
           username: row.username,
           points: Number(row.total_score || 0),
+          country: Number(row.country_score ?? row.bracket_score ?? 0),
+          placement: Number(row.placement_score || 0),
+          match: Number(row.match_score || 0),
           rank: row.rank,
           current: row.user_id === state.user?.id,
         }))
       : state.user && hasPredictions && hasResults
-      ? [{ username: state.user.username, points: total, current: true }]
+      ? [{ username: state.user.username, points: total, country: countryScore, placement: placementScore, match: matchScore, current: true }]
       : [];
     if (!rows.length) {
       dom.leaderboard.innerHTML = `<div class="empty-state">No standings yet. Users appear here after they log in, make predictions, and official results are available.</div>`;
       return;
     }
 
+    const header = el("div", "leaderboard-row leaderboard-head");
+    header.innerHTML = `
+      <strong>#</strong>
+      <span>User</span>
+      <strong>Whole</strong>
+      <strong>Place</strong>
+      <strong>Match</strong>
+      <strong>Total</strong>
+    `;
+    dom.leaderboard.appendChild(header);
+
     rows.forEach((row, index) => {
       const item = el("div", `leaderboard-row${row.current ? " current" : ""}`);
       item.innerHTML = `
         <strong>#${row.rank || index + 1}</strong>
         <span>${escapeHtml(row.username)}</span>
+        <strong>${row.country.toFixed(1)}</strong>
+        <strong>${row.placement.toFixed(1)}</strong>
+        <strong>${row.match.toFixed(1)}</strong>
         <strong>${row.points.toFixed(1)}</strong>
       `;
       dom.leaderboard.appendChild(item);
@@ -924,6 +944,7 @@
       "Grand final participant: 16 points",
       "Runner-up: 20 points",
       "Winner: 30 points",
+      "Placement accuracy: exact +1, one round away +0.5, two rounds away +0.2",
       "50% in grouped / 17-32 / 9-16: +4, 75%: +10",
       "All 3rd, 4th, finalists, runner-up, winner right: +15",
       "Match exact score doubles the round points",
@@ -1088,6 +1109,10 @@
   }
 
   function calculateBracketScore() {
+    return calculateBracketCountryScore() + calculateBracketPlacementAccuracyScore();
+  }
+
+  function calculateBracketCountryScore() {
     const actualEntries = Object.entries(actualTournamentResults);
     if (!actualEntries.length) return 0;
 
@@ -1128,6 +1153,18 @@
     return total;
   }
 
+  function calculateBracketPlacementAccuracyScore() {
+    const actualEntries = Object.entries(actualTournamentResults);
+    if (!actualEntries.length) return 0;
+
+    const predictedPlacements = placementByTeamCode(calculatePlacements());
+    return actualEntries.reduce((total, [teamCode, actualPlacement]) => {
+      const predictedPlacement = predictedPlacements[teamCode];
+      if (!predictedPlacement) return total;
+      return total + bracketPlacementAccuracyPoints(actualPlacement, predictedPlacement);
+    }, 0);
+  }
+
   function bracketPlacementPoints(actualPlacement, predictedPlacement) {
     if (actualPlacement === "winner") return predictedPlacement === "winner" ? 30 : predictedPlacement === "runner" ? 16 : 0;
     if (actualPlacement === "runner") return predictedPlacement === "runner" ? 20 : predictedPlacement === "winner" ? 16 : 0;
@@ -1137,6 +1174,27 @@
     }
     const points = { qf: 7, r16: 4, r32: 3, grouped: 2 };
     return predictedPlacement === actualPlacement ? points[actualPlacement] || 0 : 0;
+  }
+
+  function bracketPlacementAccuracyPoints(actualPlacement, predictedPlacement) {
+    if (actualPlacement === predictedPlacement) return 1;
+    const actualTier = placementTier(actualPlacement);
+    const predictedTier = placementTier(predictedPlacement);
+    if (actualTier === null || predictedTier === null) return 0;
+    const distance = Math.abs(actualTier - predictedTier);
+    if (distance <= 1) return 0.5;
+    if (distance === 2) return 0.2;
+    return 0;
+  }
+
+  function placementTier(placement) {
+    if (placement === "grouped") return 0;
+    if (placement === "r32") return 1;
+    if (placement === "r16") return 2;
+    if (placement === "qf") return 3;
+    if (placement === "third" || placement === "fourth") return 4;
+    if (placement === "winner" || placement === "runner") return 5;
+    return null;
   }
 
   function placementByTeamCode(placements) {
