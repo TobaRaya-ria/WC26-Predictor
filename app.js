@@ -904,10 +904,6 @@
       : state.user && hasPredictions && hasResults
       ? [{ username: state.user.username, points: total, country: countryScore, placement: placementScore, match: matchScore, current: true }]
       : [];
-    if (!rows.length) {
-      dom.leaderboard.innerHTML = `<div class="empty-state">No standings yet. Users appear here after they log in, make predictions, and official results are available.</div>`;
-      return;
-    }
 
     const header = el("div", "leaderboard-row leaderboard-head");
     header.innerHTML = `
@@ -919,6 +915,14 @@
       <strong>Total</strong>
     `;
     dom.leaderboard.appendChild(header);
+
+    if (!rows.length) {
+      dom.leaderboard.insertAdjacentHTML(
+        "beforeend",
+        `<div class="empty-state">No standings yet. Users appear here after they log in, make predictions, and official results are available.</div>`
+      );
+      return;
+    }
 
     rows.forEach((row, index) => {
       const item = el("div", `leaderboard-row${row.current ? " current" : ""}`);
