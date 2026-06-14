@@ -349,10 +349,10 @@ select
   username,
   total_score,
   bracket_score,
-  country_score,
-  placement_score,
   match_score,
-  rank() over (order by total_score desc, username asc) as rank
+  rank() over (order by total_score desc, username asc) as rank,
+  country_score,
+  placement_score
 from scored;
 
 grant usage on schema public to anon, authenticated, service_role;
