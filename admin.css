@@ -92,7 +92,8 @@
 
 .admin-account-grid,
 .admin-match-list,
-.admin-result-grid {
+.admin-result-grid,
+.admin-forecast {
   display: grid;
   gap: 16px;
 }
@@ -308,9 +309,57 @@
   text-transform: uppercase;
 }
 
+.admin-forecast-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-forecast-summary article {
+  display: grid;
+  gap: 6px;
+  min-height: 118px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+
+.admin-forecast-summary span,
+.admin-forecast-summary small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-forecast-summary strong {
+  font-size: 1.35rem;
+}
+
+.admin-forecast-table {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+
+.admin-forecast-table .forecast-leader td {
+  background: #e8f8ed;
+  font-weight: 900;
+}
+
+.admin-forecast-note {
+  max-width: 860px;
+  margin: -2px 0 0;
+  line-height: 1.5;
+}
+
 @media (max-width: 980px) {
   .admin-login,
   .admin-summary,
+  .admin-forecast-summary,
   .admin-groups,
   .admin-placement-grid,
   .admin-result-row,
